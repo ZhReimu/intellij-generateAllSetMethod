@@ -1,7 +1,9 @@
 <idea-plugin>
     <id>com.bruce.intellijplugin.generatesetter</id>
     <name>GenerateAllSetter</name>
-    <vendor email="gejun123456@gmail.com" url="https://github.com/gejun123456/intellij-generateAllSetMethod">bruceGe</vendor>
+    <vendor email="gejun123456@gmail.com" url="https://github.com/gejun123456/intellij-generateAllSetMethod">bruceGe
+    </vendor>
+
     <description><![CDATA[
 
     <p><a href="https://github.com/gejun123456/intellij-generateAllSetMethod">GitHub</a>
@@ -164,7 +166,8 @@
         </intentionAction>
 
         <intentionAction>
-            <className>com.bruce.intellijplugin.generatesetter.actions.GenerateBuilderGetterFromFunctionAction</className>
+            <className>com.bruce.intellijplugin.generatesetter.actions.GenerateBuilderGetterFromFunctionAction
+            </className>
             <category>GenerateAllSetter</category>
         </intentionAction>
 
@@ -179,7 +182,8 @@
         </intentionAction>
 
         <intentionAction>
-            <className>com.bruce.intellijplugin.generatesetter.actions.GenerateSetterGetterFromFunctionAction</className>
+            <className>com.bruce.intellijplugin.generatesetter.actions.GenerateSetterGetterFromFunctionAction
+            </className>
             <category>GenerateAllSetter</category>
         </intentionAction>
 
@@ -188,9 +192,11 @@
             <category>GenerateAllSetter</category>
         </intentionAction>
 
-        <applicationService serviceImplementation="com.bruce.intellijplugin.generatesetter.template.GenerateSetterService"/>
+        <applicationService
+                serviceImplementation="com.bruce.intellijplugin.generatesetter.template.GenerateSetterService"/>
 
-        <applicationConfigurable instance="com.bruce.intellijplugin.generatesetter.template.MySettings"/>
+        <applicationConfigurable instance="com.bruce.intellijplugin.generatesetter.template.MySettings"
+                                 displayName="GenerateAllSetter"/>
         <!--        <intentionAction>-->
         <!--            <className>com.bruce.intellijplugin.generatesetter.actions.GenerateByTemplateAction</className>-->
         <!--        </intentionAction>-->
