@@ -40,10 +40,7 @@ public class PsiClassUtils {
         if (okJavaSet.contains(qualifiedName)) {
             return true;
         }
-        if (qualifiedName == null || qualifiedName.startsWith("java.")) {
-            return false;
-        }
-        return true;
+        return qualifiedName != null && !qualifiedName.startsWith("java.");
     }
 
     public static boolean isValidSetMethod(PsiMethod m) {

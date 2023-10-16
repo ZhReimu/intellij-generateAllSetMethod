@@ -23,13 +23,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiImportList;
-import com.intellij.psi.PsiImportStatement;
-import com.intellij.psi.PsiImportStaticStatement;
-import com.intellij.psi.PsiJavaFile;
+import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import org.jetbrains.annotations.NotNull;
@@ -38,18 +32,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.bruce.intellijplugin.generatesetter.actions.AssertAllGetterAction.TestEngine.ASSERT;
-import static com.bruce.intellijplugin.generatesetter.actions.AssertAllGetterAction.TestEngine.ASSERTJ;
-import static com.bruce.intellijplugin.generatesetter.actions.AssertAllGetterAction.TestEngine.JUNIT4;
-import static com.bruce.intellijplugin.generatesetter.actions.AssertAllGetterAction.TestEngine.JUNIT5;
-import static com.bruce.intellijplugin.generatesetter.actions.AssertAllGetterAction.TestEngine.TESTNG;
+import static com.bruce.intellijplugin.generatesetter.actions.AssertAllGetterAction.TestEngine.*;
 
 /**
  * @author bruce ge
  */
 public class AssertAllGetterAction extends GenerateAllSetterBase {
-    enum TestEngine {ASSERT, JUNIT4, JUNIT5, TESTNG, ASSERTJ}
-
     // imports to add when generating asserts.
     private static final Map<TestEngine, String> engineImports = ImmutableMap.<TestEngine, String>builder()
             .put(JUNIT4, "static org.junit.Assert.assertEquals")
@@ -58,12 +46,10 @@ public class AssertAllGetterAction extends GenerateAllSetterBase {
             .put(ASSERTJ, "static org.assertj.core.api.Assertions.assertThat")
             .put(ASSERT, "java.util.Objects")
             .build();
-
     // className like 'java.util.Objects' -> engine (only java.util.Objects)
     private static final Map<String, TestEngine> enginePlainImportsReversed = ImmutableMap.<String, TestEngine>builder()
             .put("java.util.Objects", ASSERT)
             .build();
-
     // static className -> engine
     private static final Map<String, TestEngine> engineStaticImportsReversed = ImmutableMap.<String, TestEngine>builder()
             .put("org.junit.Assert", JUNIT4)
@@ -71,7 +57,6 @@ public class AssertAllGetterAction extends GenerateAllSetterBase {
             .put("org.testng.Assert", TESTNG)
             .put("org.assertj.core.api.Assertions", ASSERTJ)
             .build();
-
     // engine -> assert static method
     private static final Map<TestEngine, String> engineStaticImportsMethod = ImmutableMap.<TestEngine, String>builder()
             .put(JUNIT4, "assertEquals")
@@ -79,7 +64,6 @@ public class AssertAllGetterAction extends GenerateAllSetterBase {
             .put(TESTNG, "assertEquals")
             .put(ASSERTJ, "assertThat")
             .build();
-
     protected Project project;
     protected PsiFile containingFile;
 
@@ -115,11 +99,11 @@ public class AssertAllGetterAction extends GenerateAllSetterBase {
         return false;
     }
 
+    enum TestEngine {ASSERT, JUNIT4, JUNIT5, TESTNG, ASSERTJ}
 
     class GenerateAllAssertsHandlerAdapter extends GenerateAllHandlerAdapter {
-        private final boolean generateWithDefaultValues;
-
         protected final Set<TestEngine> currentFileImportedEngines = new HashSet<>();
+        private final boolean generateWithDefaultValues;
         protected TestEngine currentFileTestEngine = TestEngine.ASSERT;
 
         public GenerateAllAssertsHandlerAdapter(boolean generateWithDefaultValues) {

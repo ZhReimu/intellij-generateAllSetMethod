@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class GenerateSetterGetterFromFunctionAction extends GenerateAllSetterBase {
     public GenerateSetterGetterFromFunctionAction() {
-        super(new GenerateAllHandlerAdapter(){
+        super(new GenerateAllHandlerAdapter() {
             @Override
             public boolean isFromMethod() {
                 return true;

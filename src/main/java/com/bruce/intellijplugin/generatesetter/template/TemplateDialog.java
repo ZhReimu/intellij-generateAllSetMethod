@@ -36,12 +36,12 @@ public class TemplateDialog extends DialogWrapper {
     private JPanel panel1;
     private JBList<Template> jbList;
     private JButton editTemplateInSettingButton;
-    private PsiClass psiClass;
-    private String name;
+    private final PsiClass psiClass;
+    private final String name;
     private String generatedText;
 
 
-    public TemplateDialog(@Nullable Project project, boolean canBeParent, List<Template> templateList, PsiClass psiClass,String name) {
+    public TemplateDialog(@Nullable Project project, boolean canBeParent, List<Template> templateList, PsiClass psiClass, String name) {
         super(project, canBeParent);
         this.psiClass = psiClass;
         this.name = name;
@@ -61,10 +61,10 @@ public class TemplateDialog extends DialogWrapper {
         editTemplateInSettingButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ShowSettingsUtil.getInstance().showSettingsDialog(null,MySettings.class);
+                ShowSettingsUtil.getInstance().showSettingsDialog(null, MySettings.class);
             }
         });
-        setSize(1200,100);
+        setSize(1200, 100);
         setTitle("Generate by template");
         init();
     }

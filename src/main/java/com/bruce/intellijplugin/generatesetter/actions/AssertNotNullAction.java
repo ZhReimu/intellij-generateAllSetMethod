@@ -9,11 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.bruce.intellijplugin.generatesetter.actions.AssertAllGetterAction.TestEngine.ASSERT;
-import static com.bruce.intellijplugin.generatesetter.actions.AssertAllGetterAction.TestEngine.ASSERTJ;
-import static com.bruce.intellijplugin.generatesetter.actions.AssertAllGetterAction.TestEngine.JUNIT4;
-import static com.bruce.intellijplugin.generatesetter.actions.AssertAllGetterAction.TestEngine.JUNIT5;
-import static com.bruce.intellijplugin.generatesetter.actions.AssertAllGetterAction.TestEngine.TESTNG;
+import static com.bruce.intellijplugin.generatesetter.actions.AssertAllGetterAction.TestEngine.*;
 
 public class AssertNotNullAction extends AssertAllGetterAction {
     // imports to add when generating asserts.

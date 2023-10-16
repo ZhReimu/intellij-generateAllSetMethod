@@ -6,11 +6,7 @@ import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiVariable;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.util.IncorrectOperationException;
@@ -29,8 +25,17 @@ import java.util.function.Predicate;
  */
 public class GenerateAllSetterAction extends PsiElementBaseIntentionAction {
 
-    private static Predicate<String> isGroovyFile = s -> s != null && s.endsWith(".groovy");
+    private static final Predicate<String> isGroovyFile = s -> s != null && s.endsWith(".groovy");
 
+    //获取当前psiVariable对应的psiClass
+    @Nullable
+    private static PsiClass getVariableContainingClass(@NotNull PsiElement element) {
+        PsiVariable psiVariable = PsiTreeUtil.getParentOfType(element, PsiVariable.class);
+        if (psiVariable == null) {
+            return null;
+        }
+        return PsiTypesUtil.getPsiClass(psiVariable.getType());
+    }
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, @NotNull PsiElement element) throws IncorrectOperationException {
@@ -80,16 +85,6 @@ public class GenerateAllSetterAction extends PsiElementBaseIntentionAction {
     @Override
     public @NotNull String getText() {
         return CommonConstants.GENERATE_SETTER_METHOD_NO_DEAULT_VALUE;
-    }
-
-    //获取当前psiVariable对应的psiClass
-    @Nullable
-    private static PsiClass getVariableContainingClass(@NotNull PsiElement element) {
-        PsiVariable psiVariable = PsiTreeUtil.getParentOfType(element, PsiVariable.class);
-        if (psiVariable == null) {
-            return null;
-        }
-        return PsiTypesUtil.getPsiClass(psiVariable.getType());
     }
 
 }

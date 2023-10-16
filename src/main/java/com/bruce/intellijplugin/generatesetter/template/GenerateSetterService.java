@@ -14,12 +14,10 @@
 
 package com.bruce.intellijplugin.generatesetter.template;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -30,13 +28,13 @@ import javax.annotation.Nullable;
 @State(
         name = "com.bruce.GenerateAllSetterState",
         storages = @Storage("GenerateAllSetterPlugin.xml"))
-public class GenerateSetterService  implements PersistentStateComponent<GenerateSetterState> {
+public class GenerateSetterService implements PersistentStateComponent<GenerateSetterState> {
+
+    private GenerateSetterState myState = new GenerateSetterState();
 
     public static GenerateSetterService getInstance() {
         return ServiceManager.getService(GenerateSetterService.class);
     }
-
-    private GenerateSetterState myState = new GenerateSetterState();
 
     @Nullable
     @Override

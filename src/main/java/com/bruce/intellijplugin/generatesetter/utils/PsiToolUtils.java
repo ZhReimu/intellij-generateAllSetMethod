@@ -45,7 +45,7 @@ public class PsiToolUtils {
         }
 
         Module moduleForPsiElement = ModuleUtilCore.findModuleForPsiElement(element);
-        if(moduleForPsiElement==null){
+        if (moduleForPsiElement == null) {
             return false;
         }
         PsiClass[] listss = PsiShortNamesCache.getInstance(project).getClassesByName("Lists", GlobalSearchScope.moduleRuntimeScope(moduleForPsiElement, false));
@@ -83,13 +83,11 @@ public class PsiToolUtils {
             info.setCollectPackege(collectpart);
             String[] split = realClassPart.split(",");
             List<RealParam> params = new ArrayList<>();
-            if (split.length > 0) {
-                for (String m : split) {
-                    RealParam param = new RealParam();
-                    param.setRealPackage(m);
-                    param.setRealName(extractShortName(m));
-                    params.add(param);
-                }
+            for (String m : split) {
+                RealParam param = new RealParam();
+                param.setRealPackage(m);
+                param.setRealName(extractShortName(m));
+                params.add(param);
             }
             info.setParams(params);
         }

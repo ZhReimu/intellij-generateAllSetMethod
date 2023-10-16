@@ -15,34 +15,23 @@
 package com.bruce.intellijplugin.generatesetter.actions;
 
 import com.bruce.intellijplugin.generatesetter.CommonConstants;
-import com.bruce.intellijplugin.generatesetter.template.*;
+import com.bruce.intellijplugin.generatesetter.template.GenerateSetterService;
+import com.bruce.intellijplugin.generatesetter.template.GenerateSetterState;
+import com.bruce.intellijplugin.generatesetter.template.Template;
+import com.bruce.intellijplugin.generatesetter.template.TemplateDialog;
 import com.bruce.intellijplugin.generatesetter.utils.PsiDocumentUtils;
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComboBox;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
-import com.intellij.openapi.ui.popup.JBPopup;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.ui.KeyStrokeAdapter;
-import com.intellij.ui.components.JBList;
 import com.intellij.util.IncorrectOperationException;
 import org.apache.commons.collections.CollectionUtils;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
 /**
@@ -60,7 +49,7 @@ public class GenerateByTemplateAction extends PsiElementBaseIntentionAction {
                 GenerateSetterState state = GenerateSetterService.getInstance().getState();
                 TemplateDialog templateDialog = new TemplateDialog(element.getProject(), true, state.getTemplateList(), localVarialbeContainingClass, name);
                 boolean b = templateDialog.showAndGet();
-                if(b){
+                if (b) {
                     String generatedText = templateDialog.getGeneratedText();
                     PsiElement parent1 = psiLocal.getParent();
                     PsiDocumentManager psiDocumentManager = PsiDocumentManager
@@ -90,10 +79,7 @@ public class GenerateByTemplateAction extends PsiElementBaseIntentionAction {
         GenerateSetterState state = GenerateSetterService.getInstance().getState();
         Boolean generateByTemplate = state.getGenerateByTemplate();
         List<Template> templateList = state.getTemplateList();
-        if (generateByTemplate && CollectionUtils.isNotEmpty(templateList)) {
-            return true;
-        }
-        return false;
+        return generateByTemplate && CollectionUtils.isNotEmpty(templateList);
     }
 
     @NotNull

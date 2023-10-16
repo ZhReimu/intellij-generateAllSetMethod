@@ -85,13 +85,24 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         return splitText;
     }
 
+    public static PsiClass getLocalVariableContainingClass(@NotNull PsiElement element) {
+        PsiLocalVariable psiLocal = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
+        if (psiLocal == null) {
+            return null;
+        }
+        if (!(psiLocal.getParent() instanceof PsiDeclarationStatement)) {
+            return null;
+        }
+        return PsiTypesUtil.getPsiClass(psiLocal.getType());
+    }
+
     @Override
     public void invoke(@NotNull Project project, Editor editor, @NotNull PsiElement element) throws IncorrectOperationException {
         PsiLocalVariable psiLocal = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
         PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
         PsiFile containingFile = element.getContainingFile();
         Document document = psiDocumentManager.getDocument(containingFile);
-        if(document==null){
+        if (document == null) {
             return;
         }
         if (psiLocal != null) {
@@ -169,7 +180,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         if (parameters.length > 0) {
             genericListMap.put(qualifiedName, parameters);
         }
-        if (extendsListTypes != null && extendsListTypes.length > 0) {
+        if (extendsListTypes != null) {
             for (PsiClassType extendsListType : extendsListTypes) {
                 resolvePsiClassParameter(extendsListType);
             }
@@ -291,9 +302,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
             if (resolveClass == null) {
                 handleSyntaxError(psiClassReferenceType.getCanonicalText());
             }
-            if (resolveClass instanceof PsiTypeParameter) {
-                return true;
-            }
+            return resolveClass instanceof PsiTypeParameter;
         }
         return false;
     }
@@ -336,10 +345,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         boolean assignableFromXxx = xxxType.isAssignableFrom(psiType);
         PsiClass xxxClass = findOnePsiClassByClassName(qNameOfXxx, project);
         boolean isXxxType = psiClass.isInheritor(xxxClass, true);
-        if (assignableFromXxx || isXxxType) {
-            return true;
-        }
-        return false;
+        return assignableFromXxx || isXxxType;
     }
 
     public PsiClass findOnePsiClassByClassName(String qualifiedClassName, Project project) {
@@ -472,16 +478,5 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
             return null;
         }
         return PsiTypesUtil.getPsiClass(psiParent.getType());
-    }
-
-    public static PsiClass getLocalVariableContainingClass(@NotNull PsiElement element) {
-        PsiLocalVariable psiLocal = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
-        if (psiLocal == null) {
-            return null;
-        }
-        if (!(psiLocal.getParent() instanceof PsiDeclarationStatement)) {
-            return null;
-        }
-        return PsiTypesUtil.getPsiClass(psiLocal.getType());
     }
 }

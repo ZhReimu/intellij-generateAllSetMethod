@@ -15,7 +15,6 @@
 package com.bruce.intellijplugin.generatesetter.context;
 
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.kotlin.psi.KtProperty;
 
 /**

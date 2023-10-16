@@ -32,7 +32,7 @@ public class Parameters {
     private PsiClass returnType;
 
     private boolean isArray;
-    
+
     private int arrayDimensions;
 
 
@@ -76,11 +76,11 @@ public class Parameters {
         this.isArray = isArray;
     }
 
-    public void setArrayDimensions(int arrayDimensions) {
-        this.arrayDimensions = arrayDimensions;
-    }
-
     public int getArrayDimensions() {
         return arrayDimensions;
+    }
+
+    public void setArrayDimensions(int arrayDimensions) {
+        this.arrayDimensions = arrayDimensions;
     }
 }

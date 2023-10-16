@@ -99,7 +99,7 @@ public class GenerateAllSetterSettingForm {
                 String text1 = classNameReferenceEditor1.getText();
                 Project project = ProjectUtil.guessCurrentProject(null);
                 PsiClass aClass = JavaPsiFacade.getInstance(project).findClass(text1, GlobalSearchScope.allScope(project));
-                String result = VelocityUtils.generate(text,aClass, "demo");
+                String result = VelocityUtils.generate(text, aClass, "demo");
                 Messages.showMessageDialog(result, "Generated info", null);
             }
         });
@@ -148,12 +148,6 @@ public class GenerateAllSetterSettingForm {
         });
     }
 
-    private void updateGenerateByTemplateCheckBoxState() {
-        boolean selected = enableGenerateByTemplateCheckBox.isSelected();
-        setPanelEnabled(generateByTemplateSettings, selected);
-        setPanelEnabled(splitterPanel, selected);
-    }
-
     // https://stackoverflow.com/questions/19324918/how-to-disable-all-components-in-a-jpanel
     public static void setPanelEnabled(JPanel panel, Boolean isEnabled) {
         panel.setEnabled(isEnabled);
@@ -166,6 +160,12 @@ public class GenerateAllSetterSettingForm {
             }
             component.setEnabled(isEnabled);
         }
+    }
+
+    private void updateGenerateByTemplateCheckBoxState() {
+        boolean selected = enableGenerateByTemplateCheckBox.isSelected();
+        setPanelEnabled(generateByTemplateSettings, selected);
+        setPanelEnabled(splitterPanel, selected);
     }
 
     public JPanel getThePanel() {
@@ -288,7 +288,7 @@ public class GenerateAllSetterSettingForm {
                     editorSettings.setAdditionalLinesCount(3);
                     // 不显示换行符号
                     editorSettings.setCaretRowShown(false);
-                    ((EditorEx) editor).setHighlighter(EditorHighlighterFactory.getInstance().createEditorHighlighter(project, new LightVirtualFile("hello" + ".vm")));
+                    editor.setHighlighter(EditorHighlighterFactory.getInstance().createEditorHighlighter(project, new LightVirtualFile("hello" + ".vm")));
                     return editor;
                 }
             };
@@ -316,7 +316,7 @@ public class GenerateAllSetterSettingForm {
                     editorSettings.setAdditionalLinesCount(3);
                     // 不显示换行符号
                     editorSettings.setCaretRowShown(false);
-                    ((EditorEx) editor).setHighlighter(EditorHighlighterFactory.getInstance().createEditorHighlighter(project, new LightVirtualFile("hello" + ".vm")));
+                    editor.setHighlighter(EditorHighlighterFactory.getInstance().createEditorHighlighter(project, new LightVirtualFile("hello" + ".vm")));
                     return editor;
                 }
             };

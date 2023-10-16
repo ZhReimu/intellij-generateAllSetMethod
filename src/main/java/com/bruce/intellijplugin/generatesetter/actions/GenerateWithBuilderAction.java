@@ -16,16 +16,11 @@ package com.bruce.intellijplugin.generatesetter.actions;
 
 import com.bruce.intellijplugin.generatesetter.CommonConstants;
 import com.bruce.intellijplugin.generatesetter.GenerateAllHandlerAdapter;
-import com.bruce.intellijplugin.generatesetter.utils.PsiDocumentUtils;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiType;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +58,7 @@ public class GenerateWithBuilderAction extends GenerateAllSetterBase {
                 // insert into the element.
                 Document document = PsiDocumentManager.getInstance(project).getDocument(element.getContainingFile());
 
-                if(document==null){
+                if (document == null) {
                     return;
                 }
 

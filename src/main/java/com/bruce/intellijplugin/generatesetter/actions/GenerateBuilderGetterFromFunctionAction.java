@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 public class GenerateBuilderGetterFromFunctionAction extends GenerateAllSetterBase {
 
     public GenerateBuilderGetterFromFunctionAction() {
-        super(new GenerateAllHandlerAdapter(){
+        super(new GenerateAllHandlerAdapter() {
             @Override
             public boolean isFromMethod() {
                 return true;

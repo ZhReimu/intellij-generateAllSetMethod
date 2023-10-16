@@ -27,6 +27,17 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ListReturnTypeHandler implements ComplexReturnTypeHandler {
 
+    private static String generateAddTextForCollectParam(NewMethodInfo deepInfo, Parameters returnParamInfo, String returnVariableName, String splitText) {
+        String methodName = "convertTo";
+        if (returnParamInfo.getParams().size() > 0) {
+            methodName = methodName + returnParamInfo.getParams().get(0).getRealName();
+        }
+        String insertText = splitText + "for(int i=0;i<" + deepInfo.getParamName() + ".size();i++){" +
+                splitText + "\t" + returnVariableName + ".add(" + methodName + "(" + deepInfo.getParamName() + ".get(i)));" +
+                splitText + "}";
+        return insertText;
+    }
+
     @NotNull
     @Override
     public InsertDto handle(Parameters returnParamInfo, String splitText, PsiParameter[] parameters, boolean hasGuava) {
@@ -87,17 +98,5 @@ public class ListReturnTypeHandler implements ComplexReturnTypeHandler {
 
         insertDto.setAddedText(insertText.toString());
         return insertDto;
-    }
-
-    private static String generateAddTextForCollectParam(NewMethodInfo deepInfo, Parameters returnParamInfo, String returnVariableName, String splitText) {
-        String methodName = "convertTo";
-        if (returnParamInfo.getParams().size() > 0) {
-            methodName = methodName + returnParamInfo.getParams().get(0).getRealName();
-        }
-        StringBuilder insertText = new StringBuilder();
-        insertText.append(splitText + "for(int i=0;i<" + deepInfo.getParamName() + ".size();i++){");
-        insertText.append(splitText + "\t" + returnVariableName + ".add(" + methodName + "(" + deepInfo.getParamName() + ".get(i)));");
-        insertText.append(splitText + "}");
-        return insertText.toString();
     }
 }

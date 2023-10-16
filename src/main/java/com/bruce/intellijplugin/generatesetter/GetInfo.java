@@ -30,7 +30,7 @@ public class GetInfo {
     private List<PsiMethod> getMethods;
 
 
-    private Map<String,PsiMethod> nameToMethodMap;
+    private Map<String, PsiMethod> nameToMethodMap;
 
 
     public Map<String, PsiMethod> getNameToMethodMap() {

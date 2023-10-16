@@ -23,11 +23,12 @@ import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiMethod;
 import com.intellij.util.IncorrectOperationException;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.kotlin.psi.*;
+import org.jetbrains.kotlin.psi.KtProperty;
 
 import java.util.Locale;
 
@@ -35,6 +36,20 @@ import java.util.Locale;
  * @author bruce ge
  */
 public class GenerateAllSetterForPropertiesAction extends PsiElementBaseIntentionAction {
+    public static String methodToProperty(String name) {
+        if (name.startsWith("set")) {
+            name = name.substring(3);
+        } else {
+//      throw new ReflectionException("Error parsing property name '" + name + "'.  Didn't start with 'is', 'get' or 'set'.");
+            return "";
+        }
+
+        if (name.length() == 1 || (name.length() > 1 && !Character.isUpperCase(name.charAt(1)))) {
+            name = name.substring(0, 1).toLowerCase(Locale.ENGLISH) + name.substring(1);
+        }
+        return name;
+    }
+
     @Override
     public void invoke(@NotNull Project project, Editor editor, @NotNull PsiElement element) throws IncorrectOperationException {
         KotlinContext currentElementContext =
@@ -52,7 +67,7 @@ public class GenerateAllSetterForPropertiesAction extends PsiElementBaseIntentio
 
         StringBuilder builder = new StringBuilder();
         for (PsiMethod m : methods) {
-            if(PsiClassUtils.isValidSetMethod(m)){
+            if (PsiClassUtils.isValidSetMethod(m)) {
                 String methodPropName = methodToProperty(m.getName());
                 builder.append(splitText + propertyName + "." + methodPropName + " = ");
             }
@@ -64,28 +79,11 @@ public class GenerateAllSetterForPropertiesAction extends PsiElementBaseIntentio
         PsiDocumentUtils.commitAndSaveDocument(instance, document);
     }
 
-    public static String methodToProperty(String name) {
-        if (name.startsWith("set")) {
-            name = name.substring(3);
-        } else {
-//      throw new ReflectionException("Error parsing property name '" + name + "'.  Didn't start with 'is', 'get' or 'set'.");
-            return "";
-        }
-
-        if (name.length() == 1 || (name.length() > 1 && !Character.isUpperCase(name.charAt(1)))) {
-            name = name.substring(0, 1).toLowerCase(Locale.ENGLISH) + name.substring(1);
-        }
-        return name;
-    }
-
     @Override
     public boolean isAvailable(@NotNull Project project, Editor editor, @NotNull PsiElement element) {
         KotlinContext currentElementContext =
                 KotlinUtils.getCurrentElementContext(element);
-        if (currentElementContext == null) {
-            return false;
-        }
-        return true;
+        return currentElementContext != null;
 
     }
 

@@ -16,34 +16,12 @@ package com.bruce.intellijplugin.generatesetter.actions;
 
 import com.bruce.intellijplugin.generatesetter.CommonConstants;
 import com.bruce.intellijplugin.generatesetter.GenerateAllHandlerAdapter;
-import com.bruce.intellijplugin.generatesetter.GetInfo;
-import com.bruce.intellijplugin.generatesetter.Parameters;
-import com.bruce.intellijplugin.generatesetter.complexreturntype.*;
-import com.bruce.intellijplugin.generatesetter.utils.PsiClassUtils;
-import com.bruce.intellijplugin.generatesetter.utils.PsiDocumentUtils;
-import com.bruce.intellijplugin.generatesetter.utils.PsiToolUtils;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiTypesUtil;
-import com.intellij.util.IncorrectOperationException;
-import org.apache.commons.lang.StringUtils;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
 
 /**
  * Created by bruce.ge on 2016/12/23.
  */
 public class GenerateAllSetterAction extends GenerateAllSetterBase {
-
 
     public GenerateAllSetterAction() {
         super(new GenerateAllHandlerAdapter() {

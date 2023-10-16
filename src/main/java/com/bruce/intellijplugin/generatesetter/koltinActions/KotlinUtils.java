@@ -89,7 +89,7 @@ public class KotlinUtils {
         }
 
 
-        if(!PsiClassUtils.checkClassHasValidSetMethod(findedClass)){
+        if (!PsiClassUtils.checkClassHasValidSetMethod(findedClass)) {
             return null;
         }
 

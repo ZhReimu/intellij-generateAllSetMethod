@@ -18,7 +18,6 @@ package com.bruce.intellijplugin.generatesetter.template;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.rits.cloning.Cloner;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -28,13 +27,12 @@ import javax.swing.*;
  */
 public class MySettings implements Configurable {
 
+    private GenerateAllSetterSettingForm generateAllSetterSettingForm;
 
     @Override
     public String getDisplayName() {
         return "GenerateAllSetter";
     }
-
-    private GenerateAllSetterSettingForm generateAllSetterSettingForm;
 
     @Nullable
     @Override
@@ -44,8 +42,7 @@ public class MySettings implements Configurable {
         GenerateSetterState state = instance.getState();
         GenerateSetterState generateSetterState = Cloner.standard().deepClone(state);
         generateAllSetterSettingForm.importFromSettings(generateSetterState);
-        JPanel thePanel = generateAllSetterSettingForm.getThePanel();
-        return thePanel;
+        return generateAllSetterSettingForm.getThePanel();
     }
 
     @Override
@@ -53,11 +50,7 @@ public class MySettings implements Configurable {
         GenerateSetterState theState = generateAllSetterSettingForm.getTheState();
         GenerateSetterService instance = GenerateSetterService.getInstance();
         GenerateSetterState state = instance.getState();
-        if(theState.equals(state)){
-            return false;
-        } else {
-            return true;
-        }
+        return !theState.equals(state);
     }
 
     @Override

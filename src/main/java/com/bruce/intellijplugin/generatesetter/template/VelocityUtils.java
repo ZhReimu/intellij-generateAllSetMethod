@@ -39,10 +39,10 @@ public class VelocityUtils {
             StringBuilder builder = new StringBuilder("catch exception when generate\n");
             StringWriter writer = new StringWriter();
             e.printStackTrace(new PrintWriter(writer));
-            builder.append(writer.toString());
+            builder.append(writer);
             return builder.toString().replace("\r", "");
         }
         String code = stringWriter.toString();
-        return code.toString();
+        return code;
     }
 }
