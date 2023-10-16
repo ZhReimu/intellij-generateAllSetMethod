@@ -40,61 +40,7 @@ import java.util.*;
  */
 public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
 
-    public Map<String, PsiType[]> genericListMap = new HashMap<>();
-
-    private static String extractSplitText(PsiMethod method, Document document) {
-        int startOffset = method.getTextRange().getStartOffset();
-        int lastLine = startOffset - 1;
-        String text = document.getText(new TextRange(lastLine, lastLine + 1));
-        boolean isTable = false;
-        while (!text.equals("\n")) {
-            if (text.equals('\t')) {
-                isTable = true;
-            }
-            lastLine--;
-            text = document.getText(new TextRange(lastLine, lastLine + 1));
-        }
-        String methodStartToLastLineText = document
-                .getText(new TextRange(lastLine, startOffset));
-        String splitText = "";
-        if (isTable) {
-            splitText += methodStartToLastLineText + "\t";
-        } else {
-            splitText = methodStartToLastLineText + "    ";
-        }
-        return splitText;
-    }
-
-    @NotNull
-    public static String calculateSplitText(Document document, int statementOffset, String addition) {
-        // 取得要计算的行有代码地方的初始 offset, 即 statementOffset
-        // 根据这个offset 往前遍历取得其缩进, 可能为 空格或 \t
-        // 若需要在此基础上再缩进一次, 可对参数 addition 赋值 4个空格
-        String splitText = "";
-        int cur = statementOffset;
-        String text = document.getText(new TextRange(cur - 1, cur));
-        while (text.equals(" ") || text.equals("\t")) {
-            splitText = text + splitText;
-            cur--;
-            if (cur < 1) {
-                break;
-            }
-            text = document.getText(new TextRange(cur - 1, cur));
-        }
-        splitText = "\n" + addition + splitText;
-        return splitText;
-    }
-
-    public static PsiClass getLocalVariableContainingClass(@NotNull PsiElement element) {
-        PsiLocalVariable psiLocal = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
-        if (psiLocal == null) {
-            return null;
-        }
-        if (!(psiLocal.getParent() instanceof PsiDeclarationStatement)) {
-            return null;
-        }
-        return PsiTypesUtil.getPsiClass(psiLocal.getType());
-    }
+    private static final Map<String, PsiType[]> genericListMap = new HashMap<>();
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, @NotNull PsiElement element) throws IncorrectOperationException {
@@ -130,7 +76,46 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         }
     }
 
-    private void handleWithPsiType(Document document, PsiDocumentManager psiDocumentManager, PsiFile containingFile, PsiType psiType, String generateName, String splitText, int insertOffset) {
+    @Nls
+    @NotNull
+    @Override
+    public String getFamilyName() {
+        return CommonConstants.GENERATE_GETTER_METHOD;
+    }
+
+    @NotNull
+    @Override
+    public String getText() {
+        return CommonConstants.GENERATE_GETTER_METHOD;
+    }
+
+    @Override
+    public boolean isAvailable(@NotNull Project project, Editor editor, @NotNull PsiElement element) {
+        // 只需确保该变量含有 get 方法即可
+        PsiClass localVariableContainingClass = getLocalVariableContainingClass(element);
+        if (localVariableContainingClass != null) {
+            return PsiClassUtils.checkClasHasValidGetMethod(localVariableContainingClass);
+        }
+        return Optional.ofNullable(PsiTreeUtil.getParentOfType(element, PsiParameter.class))
+                .map(PsiParameter::getType).map(PsiTypesUtil::getPsiClass)
+                .map(PsiClassUtils::checkClasHasValidGetMethod).filter(it -> it).isPresent();
+    }
+
+    private static PsiClass getLocalVariableContainingClass(@NotNull PsiElement element) {
+        PsiLocalVariable psiLocal = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
+        if (psiLocal == null) {
+            return null;
+        }
+        if (!(psiLocal.getParent() instanceof PsiDeclarationStatement)) {
+            return null;
+        }
+        return PsiTypesUtil.getPsiClass(psiLocal.getType());
+    }
+
+    private void handleWithPsiType(
+            Document document, PsiDocumentManager psiDocumentManager, PsiFile containingFile,
+            PsiType psiType, String generateName, String splitText, int insertOffset
+    ) {
         HashSet<String> newImportList = new HashSet<>();
         PsiClass psiClass = PsiTypesUtil.getPsiClass(psiType);
         if (psiType instanceof PsiClassReferenceType) {
@@ -138,10 +123,9 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
             resolvePsiClassParameter(referenceType);
         }
         List<PsiMethod> methodList = PsiClassUtils.extractGetMethod(psiClass);
-        if (methodList.size() == 0) {
+        if (methodList.isEmpty()) {
             return;
         }
-
         String buildString = generateStringForGetter(generateName, methodList, splitText, newImportList);
         document.insertString(insertOffset, buildString);
         PsiDocumentUtils.commitAndSaveDocument(psiDocumentManager, document);
@@ -172,7 +156,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         builder.append(str);
     }
 
-    protected void resolvePsiClassParameter(PsiClassType psiClassReferenceType) {
+    private void resolvePsiClassParameter(PsiClassType psiClassReferenceType) {
         PsiClass psiClass = psiClassReferenceType.resolve();
         String qualifiedName = psiClass.getQualifiedName();
         PsiClassType[] extendsListTypes = psiClass.getExtendsListTypes();
@@ -187,7 +171,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         }
     }
 
-    public boolean isJavaBaseType(String typeName) {
+    private boolean isJavaBaseType(String typeName) {
         switch (typeName) {
             case "byte":
             case "char":
@@ -209,11 +193,11 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         }
     }
 
-    protected void handleSyntaxError(String code) throws RuntimeException {
+    private void handleSyntaxError(String code) throws RuntimeException {
         throw new RuntimeException("您的代码可能存在语法错误, 无法为您生成代码, 参考信息: " + code);
     }
 
-    protected String getRealPsiTypeName(PsiType psiType, Project project, String typeNameFormat) {
+    private String getRealPsiTypeName(PsiType psiType, Project project, String typeNameFormat) {
         if (isPsiTypeFromParameter(psiType)) {
             PsiType realPsiType = getRealPsiType(psiType, project, psiType);
             if (psiType == realPsiType) {
@@ -279,7 +263,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         return defaultVal;
     }
 
-    protected PsiType getRealPsiType(PsiType psiFieldType, Project project, PsiType defaultVal) {
+    private PsiType getRealPsiType(PsiType psiFieldType, Project project, PsiType defaultVal) {
         PsiClassReferenceType psiClassReferenceType = (PsiClassReferenceType) psiFieldType;
         PsiClass resolveClass = psiClassReferenceType.resolve();
         if (resolveClass instanceof PsiTypeParameter) {
@@ -295,7 +279,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         return defaultVal;
     }
 
-    protected boolean isPsiTypeFromParameter(PsiType psiFieldType) {
+    private boolean isPsiTypeFromParameter(PsiType psiFieldType) {
         if (psiFieldType instanceof PsiClassReferenceType) {
             PsiClassReferenceType psiClassReferenceType = (PsiClassReferenceType) psiFieldType;
             PsiClass resolveClass = psiClassReferenceType.resolve();
@@ -307,7 +291,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         return false;
     }
 
-    protected boolean isPsiTypeFromList(PsiType psiFieldType, Project project) {
+    private boolean isPsiTypeFromList(PsiType psiFieldType, Project project) {
         boolean isReferenceType = psiFieldType instanceof PsiClassReferenceType;
         if (isReferenceType) {
             PsiClassReferenceType psiClassReferenceType = (PsiClassReferenceType) psiFieldType;
@@ -321,7 +305,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         return false;
     }
 
-    protected boolean isPsiTypeFromMap(PsiType psiFieldType, Project project) {
+    private boolean isPsiTypeFromMap(PsiType psiFieldType, Project project) {
         boolean isReferenceType = psiFieldType instanceof PsiClassReferenceType;
         if (isReferenceType) {
             PsiClassReferenceType psiClassReferenceType = (PsiClassReferenceType) psiFieldType;
@@ -335,7 +319,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         return false;
     }
 
-    public boolean isPsiClassFromXxx(PsiClass psiClass, Project project, String qNameOfXxx) {
+    private boolean isPsiClassFromXxx(PsiClass psiClass, Project project, String qNameOfXxx) {
         String qNameOfClass = psiClass.getQualifiedName();
         if (StringUtils.isBlank(qNameOfClass)) {
             return false;
@@ -348,7 +332,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         return assignableFromXxx || isXxxType;
     }
 
-    public PsiClass findOnePsiClassByClassName(String qualifiedClassName, Project project) {
+    private PsiClass findOnePsiClassByClassName(String qualifiedClassName, Project project) {
         return JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, GlobalSearchScope.allScope(project));
     }
 
@@ -408,7 +392,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
 
             // List
             if (isPsiTypeFromList(psiFieldType, project)) {
-                if (parameters != null && parameters.length > 0) {
+                if (parameters.length > 0) {
                     newImportList.add("java.util.List");
                     PsiType elementType = parameters[0];
                     String typeFormat = String.format(typeNameFormat, "List<%s>");
@@ -421,7 +405,7 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
 
             // Map
             if (isPsiTypeFromMap(psiFieldType, project)) {
-                if (parameters != null && parameters.length > 1) {
+                if (parameters.length > 1) {
                     newImportList.add("java.util.Map");
                     PsiType keyType = parameters[0];
                     PsiType valueType = parameters[1];
@@ -444,39 +428,24 @@ public class GenerateAllGetterAction extends PsiElementBaseIntentionAction {
         return fieldTypeName;
     }
 
-    @Nls
     @NotNull
-    @Override
-    public String getFamilyName() {
-        return CommonConstants.GENERATE_GETTER_METHOD;
-    }
-
-    @NotNull
-    @Override
-    public String getText() {
-        return CommonConstants.GENERATE_GETTER_METHOD;
-    }
-
-    @Override
-    public boolean isAvailable(@NotNull Project project, Editor editor, @NotNull PsiElement element) {
-        // 只需确保该变量含有get方法即可
-        PsiClass localVariableContainingClass = getLocalVariableContainingClass(element);
-        if (localVariableContainingClass != null) {
-
-            return PsiClassUtils.checkClasHasValidGetMethod(localVariableContainingClass);
+    private static String calculateSplitText(Document document, int statementOffset, String addition) {
+        // 取得要计算的行有代码地方的初始 offset, 即 statementOffset
+        // 根据这个offset 往前遍历取得其缩进, 可能为 空格或 \t
+        // 若需要在此基础上再缩进一次, 可对参数 addition 赋值 4个空格
+        StringBuilder splitText = new StringBuilder();
+        int cur = statementOffset;
+        String text = document.getText(new TextRange(cur - 1, cur));
+        while (text.equals(" ") || text.equals("\t")) {
+            splitText.insert(0, text);
+            cur--;
+            if (cur < 1) {
+                break;
+            }
+            text = document.getText(new TextRange(cur - 1, cur));
         }
-        PsiClass methodParameterContainingClass = getMethodParameterContainingClass(element);
-        if (methodParameterContainingClass != null) {
-            return PsiClassUtils.checkClasHasValidGetMethod(methodParameterContainingClass);
-        }
-        return false;
+        splitText.insert(0, "\n" + addition);
+        return splitText.toString();
     }
 
-    private PsiClass getMethodParameterContainingClass(PsiElement element) {
-        PsiParameter psiParent = PsiTreeUtil.getParentOfType(element, PsiParameter.class);
-        if (psiParent == null) {
-            return null;
-        }
-        return PsiTypesUtil.getPsiClass(psiParent.getType());
-    }
 }

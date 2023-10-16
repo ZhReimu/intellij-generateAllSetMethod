@@ -17,6 +17,7 @@ package com.bruce.intellijplugin.generatesetter.utils;
 import com.bruce.intellijplugin.generatesetter.actions.GenerateAllSetterAction;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -25,9 +26,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @Author bruce.ge
- * @Date 2017/1/30
- * @Description
+ * @author bruce.ge
+ * @since 2017/1/30
  */
 public class PsiClassUtils {
     public static boolean isNotSystemClass(PsiClass psiClass) {
@@ -44,13 +44,13 @@ public class PsiClassUtils {
     }
 
     public static boolean isValidSetMethod(PsiMethod m) {
-        return m.hasModifierProperty("public") &&
-                !m.hasModifierProperty("static") &&
+        return m.hasModifierProperty(PsiModifier.PUBLIC) &&
+                !m.hasModifierProperty(PsiModifier.STATIC) &&
                 (m.getName().startsWith("set") || m.getName().startsWith("with"));
     }
 
     public static boolean isValidGetMethod(PsiMethod m) {
-        return m.hasModifierProperty("public") && !m.hasModifierProperty("static") &&
+        return m.hasModifierProperty(PsiModifier.PUBLIC) && !m.hasModifierProperty(PsiModifier.STATIC) &&
                 (m.getName().startsWith(GenerateAllSetterAction.GET) || m.getName().startsWith(GenerateAllSetterAction.IS));
     }
 
